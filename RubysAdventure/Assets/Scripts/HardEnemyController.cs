@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyController : MonoBehaviour
+public class HardEnemyController : MonoBehaviour
 {
     public float speed;
     public ParticleSystem smokeEffect;
@@ -14,7 +14,7 @@ public class EnemyController : MonoBehaviour
     Rigidbody2D rigidbody2D;
     float timer;
     int direction = 1;
-    private RubyController rubyController; // this line of code creates a variable called "rubyController" to store information about the RubyController script!
+    private RubyController rubyController;
 
     void Start()
     {
@@ -22,7 +22,6 @@ public class EnemyController : MonoBehaviour
         rigidbody2D = GetComponent<Rigidbody2D>();
         timer = changeTime;
         animator = GetComponent<Animator>();
-
         GameObject rubyControllerObject = GameObject.FindWithTag("RubyController"); //this line of code finds the RubyController script by looking for a "RubyController" tag on Ruby
 
         if (rubyControllerObject != null)
@@ -89,7 +88,7 @@ public class EnemyController : MonoBehaviour
 
         if (player != null)
         {
-            player.ChangeHealth(-1);
+            player.ChangeHealth(-2);
         }
     }
     public void Fix()

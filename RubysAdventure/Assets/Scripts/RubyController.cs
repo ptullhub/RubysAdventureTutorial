@@ -1,25 +1,40 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using TMPro;
+
 
 public class RubyController : MonoBehaviour
 {
     public float speed = 3.0f;
     public GameObject projectilePrefab;
     public ParticleSystem damageEffect;
-    
+    public ParticleSystem healthEffect;
 
+    public static int level = 1;
     public int maxHealth = 5;
+    public Text scoreText;
+    public Text ammoText;
+    public GameObject levelText;
+    public GameObject loseText;
+    public GameObject winText;
+    public static int score = 0;
     public float timeInvincible = 2.0f;
-
+    public int cogs;
     public int health { get { return currentHealth; } }
     int currentHealth;
-
+    bool gameOver;
     bool isInvincible;
     float invincibleTimer;
+    public AudioClip bgMusic;
     public AudioClip cogThrow;
     public AudioClip hitSound;
+    public AudioClip winSound;
+    public AudioClip loseSound;
     AudioSource audioSource;
+    AudioSource musicSource;
     Rigidbody2D rigidbody2d;
 
     Animator animator;
@@ -34,12 +49,24 @@ public class RubyController : MonoBehaviour
         rigidbody2d = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         audioSource = GetComponent<AudioSource>();
+        musicSource = GetComponent<AudioSource>();
+        scoreText.text = "Robots Fixed: " + score.ToString();
         currentHealth = maxHealth;
+        levelText.SetActive(false);
+        loseText.SetActive(false);
+        winText.SetActive(false);
+        gameOver = false;
+        musicSource.clip = bgMusic;
+        musicSource.Play();
+        musicSource.loop = true;
+        cogs = 4;
+        ammoText.text = cogs.ToString();
     }
 
     // Update is called once per frame
     void Update()
     {
+        ammoText.text = cogs.ToString();
         horizontal = Input.GetAxis("Horizontal");
         vertical = Input.GetAxis("Vertical");
 
@@ -74,6 +101,13 @@ public class RubyController : MonoBehaviour
             {
                 if (hit.collider != null)
                 {
+                    if (score == 6)
+                    {
+                        SceneManager.LoadScene("Scene2");
+                        loseText.SetActive(false);
+                        winText.SetActive(false);
+                        level++;
+                    }
                     NonPlayerCharacter character = hit.collider.GetComponent<NonPlayerCharacter>();
                     if (character != null)
                     {
@@ -82,6 +116,25 @@ public class RubyController : MonoBehaviour
                 }
             }
         }
+        if (Input.GetKey(KeyCode.R))
+        {
+            if (gameOver == true)
+            {
+                if (level == 1)
+                {
+                    score = 0;
+                    SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+                }
+                if (level == 2)
+                {
+                    score = 6;
+                    scoreText.text = "Robots Fixed: " + score.ToString();
+                    SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+                }
+                 
+            }
+        }
+
     }
 
     void FixedUpdate()
@@ -92,6 +145,7 @@ public class RubyController : MonoBehaviour
 
         rigidbody2d.MovePosition(position);
     }
+
 
     public void ChangeHealth(int amount)
     {
@@ -105,9 +159,43 @@ public class RubyController : MonoBehaviour
             damageEffect.Play();
             PlaySound(hitSound);
         }
-
-        currentHealth = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
+        if (amount > 0)
+        {
+            healthEffect.Play();
+        }
+        if (health <= 1)
+        {
+            Destroy(rigidbody2d);
+            loseText.SetActive(true);
+            gameOver = true;
+            musicSource.clip = loseSound;
+            musicSource.Play();
+            musicSource.loop = false;
+        }
+            currentHealth = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
         UIHealthBar.instance.SetValue(currentHealth / (float)maxHealth);
+        
+    }
+
+    public void ChangeScore(int scoreAmount)
+    {
+        score = score + scoreAmount;
+        scoreText.text = "Robots Fixed: " + score.ToString();
+        if (score == 6)
+        {
+            levelText.SetActive(true);
+            gameOver = true;
+        }
+        if (score == 12)
+        {
+            musicSource.clip = winSound;
+            musicSource.Play();
+            musicSource.loop = false;
+            gameOver = true;
+            winText.SetActive(true);
+
+            Destroy(rigidbody2d);
+        }
     }
 
     public void PlaySound(AudioClip clip)
@@ -117,13 +205,25 @@ public class RubyController : MonoBehaviour
 
     void Launch()
     {
-        GameObject projectileObject = Instantiate(projectilePrefab, rigidbody2d.position + Vector2.up * 0.5f, Quaternion.identity);
+        if (cogs >= 1)
+        {
+            GameObject projectileObject = Instantiate(projectilePrefab, rigidbody2d.position + Vector2.up * 0.5f, Quaternion.identity);
 
-        Projectile projectile = projectileObject.GetComponent<Projectile>();
-        projectile.Launch(lookDirection, 300);
-
-        animator.SetTrigger("Launch");
-        PlaySound(cogThrow);
+            Projectile projectile = projectileObject.GetComponent<Projectile>();
+            projectile.Launch(lookDirection, 300);
+            cogs--;
+            animator.SetTrigger("Launch");
+            PlaySound(cogThrow);
+        }
+       
+    }
+    public void OnCollisionEnter2D(Collision2D ammo)
+    {
+        if (ammo.gameObject.CompareTag("CogPickup"))
+        {
+            Destroy(ammo.collider.gameObject);
+            cogs += 4;
+        }
     }
 }
 
