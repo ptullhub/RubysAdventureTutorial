@@ -6,6 +6,8 @@ TagManager:
   tags:
   - RubyController
   - CogPickup
+  - Fido
+  - Jambi
   layers:
   - Default
   - TransparentFX

@@ -4920,19 +4920,29 @@ MonoBehaviour:
   projectilePrefab: {fileID: 1960084733528490438, guid: 4309716c8fe962b4db53d6ba63d195c7, type: 3}
   damageEffect: {fileID: 4723704495837347345}
   healthEffect: {fileID: 4723704495712897573}
+  boneBG: {fileID: 0}
+  boneImage: {fileID: 0}
   maxHealth: 5
   scoreText: {fileID: 7856854655037655391, guid: c65fd9954c8592141a5687f1e5325404, type: 3}
   ammoText: {fileID: 3628362168459520655, guid: 59b011dd64f2992468cc6997dc59b524, type: 3}
+  boneText: {fileID: 0}
   levelText: {fileID: 7740138736617666545, guid: 922e1cf545d62e44f8a1a7ad2dd44494, type: 3}
   loseText: {fileID: 7448404112999069884, guid: 1d4aa39df31b3e44d93a5ff4999db53f, type: 3}
   winText: {fileID: 4224183590238092402, guid: 3abe61e61ebcddc47b1dadbb55f2b82d, type: 3}
+  boneParent: {fileID: 0}
   timeInvincible: 2
+  bones: 0
   cogs: 0
   bgMusic: {fileID: 8300000, guid: e406c04157c663a43b859646b7ad3c2a, type: 3}
   cogThrow: {fileID: 8300000, guid: b2edfd40873655249ba0e01a5cf705be, type: 3}
   hitSound: {fileID: 8300000, guid: 9b1bb1f450b7d444fa4a8019d13519a7, type: 3}
   winSound: {fileID: 8300000, guid: f987bfc0b774d3f4e82dc47e91f78584, type: 3}
   loseSound: {fileID: 8300000, guid: e1f2442b28f23ce46aa8b42891a983f0, type: 3}
+  fixSound: {fileID: 8300000, guid: e7fa1971a86d60945bb64585c0ac14d5, type: 3}
+  collectClip: {fileID: 8300000, guid: af5f8b64e3f58f24c87ff8f789b04f6c, type: 3}
+  walking: {fileID: 8300000, guid: a20c77ecd5de9eb4a98731b45ad84c3e, type: 3}
+  bark: {fileID: 8300000, guid: 2bc69067f45ea7b4c8da2decd28aed6b, type: 3}
+  croak: {fileID: 8300000, guid: 05d42a96577dfa147b076f7ef1f77e09, type: 3}
 --- !u!50 &4723704496231918879
 Rigidbody2D:
   serializedVersion: 4
@@ -5012,7 +5022,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.8
   m_Pitch: 1
   Loop: 0
   Mute: 0

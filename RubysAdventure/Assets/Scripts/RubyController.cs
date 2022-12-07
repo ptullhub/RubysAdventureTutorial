@@ -14,14 +14,19 @@ public class RubyController : MonoBehaviour
     public ParticleSystem healthEffect;
 
     public static int level = 1;
+    public Image boneBG;
+    public Image boneImage;
     public int maxHealth = 5;
     public Text scoreText;
     public Text ammoText;
+    public Text boneText;
     public GameObject levelText;
     public GameObject loseText;
     public GameObject winText;
+    public GameObject boneParent;
     public static int score = 0;
     public float timeInvincible = 2.0f;
+    public int bones = 0;
     public int cogs;
     public int health { get { return currentHealth; } }
     int currentHealth;
@@ -33,6 +38,11 @@ public class RubyController : MonoBehaviour
     public AudioClip hitSound;
     public AudioClip winSound;
     public AudioClip loseSound;
+    public AudioClip fixSound;
+    public AudioClip collectClip;
+    public AudioClip walking;
+    public AudioClip bark;
+    public AudioClip croak;
     AudioSource audioSource;
     AudioSource musicSource;
     Rigidbody2D rigidbody2d;
@@ -46,12 +56,18 @@ public class RubyController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        
         rigidbody2d = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         audioSource = GetComponent<AudioSource>();
         musicSource = GetComponent<AudioSource>();
+        boneText.text = bones.ToString() + "/5";
         scoreText.text = "Robots Fixed: " + score.ToString();
         currentHealth = maxHealth;
+        boneBG.enabled = false;
+        boneImage.enabled = false;
+        boneText.enabled = false;
+        boneParent.SetActive(false);
         levelText.SetActive(false);
         loseText.SetActive(false);
         winText.SetActive(false);
@@ -101,17 +117,30 @@ public class RubyController : MonoBehaviour
             {
                 if (hit.collider != null)
                 {
-                    if (score == 6)
+                    NonPlayerCharacter noncharacter = hit.collider.GetComponent<NonPlayerCharacter>();
+                    if (noncharacter.gameObject.CompareTag("Jambi"))
                     {
-                        SceneManager.LoadScene("Scene2");
-                        loseText.SetActive(false);
-                        winText.SetActive(false);
-                        level++;
+                        PlaySound(croak);
+                        if (score == 6)
+                        {
+                            SceneManager.LoadScene("Scene2");
+                            loseText.SetActive(false);
+                            winText.SetActive(false);
+                            level++;
+                        }
                     }
                     NonPlayerCharacter character = hit.collider.GetComponent<NonPlayerCharacter>();
                     if (character != null)
                     {
                         character.DisplayDialog();
+                    }
+                    if (character.gameObject.CompareTag("Fido"))
+                    {
+                        PlaySound(bark);
+                        boneParent.SetActive(true);
+                        boneBG.enabled = true;
+                        boneImage.enabled = true;
+                        boneText.enabled = true;
                     }
                 }
             }
@@ -134,7 +163,22 @@ public class RubyController : MonoBehaviour
                  
             }
         }
-
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+            PlaySound(walking);
+        }
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            PlaySound(walking);
+        }
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            PlaySound(walking);
+        }
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            PlaySound(walking);
+        }
     }
 
     void FixedUpdate()
@@ -181,6 +225,7 @@ public class RubyController : MonoBehaviour
     {
         score = score + scoreAmount;
         scoreText.text = "Robots Fixed: " + score.ToString();
+        PlaySound(fixSound);
         if (score == 6)
         {
             levelText.SetActive(true);
@@ -188,14 +233,22 @@ public class RubyController : MonoBehaviour
         }
         if (score == 12)
         {
-            musicSource.clip = winSound;
-            musicSource.Play();
-            musicSource.loop = false;
-            gameOver = true;
-            winText.SetActive(true);
+            if (bones == 5) 
+            {
+                musicSource.clip = winSound;
+                musicSource.Play();
+                musicSource.loop = false;
+                gameOver = true;
+                winText.SetActive(true);
 
-            Destroy(rigidbody2d);
+                Destroy(rigidbody2d);
+            }
         }
+    }
+
+    public void ChangeSpeed(float speedAmount)
+    {
+        speed = speed + speedAmount;
     }
 
     public void PlaySound(AudioClip clip)
@@ -203,6 +256,12 @@ public class RubyController : MonoBehaviour
         audioSource.PlayOneShot(clip);
     }
 
+    public void BoneCount(int bone)
+    {
+        bones = bones + bone;
+        boneText.text = bones.ToString() + "/5";
+        ChangeScore(0);
+    }
     void Launch()
     {
         if (cogs >= 1)
@@ -221,10 +280,12 @@ public class RubyController : MonoBehaviour
     {
         if (ammo.gameObject.CompareTag("CogPickup"))
         {
+            PlaySound(collectClip);
             Destroy(ammo.collider.gameObject);
             cogs += 4;
         }
     }
+
 }
 
 

@@ -10,7 +10,6 @@ public class EnemyController : MonoBehaviour
     bool broken;
     public float changeTime = 3.0f;
     Animator animator;
-
     Rigidbody2D rigidbody2D;
     float timer;
     int direction = 1;
@@ -100,4 +99,5 @@ public class EnemyController : MonoBehaviour
         smokeEffect.Stop();
         rubyController.ChangeScore(1);
     }
+
 }
